@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # tests/issue-28-archive-cas.test.ts runs the released v2.9.0 code
           # (git show v2.9.0:...) against the archive migration; a shallow
@@ -42,7 +42,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22.x
           cache: npm
