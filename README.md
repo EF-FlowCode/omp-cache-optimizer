@@ -6,7 +6,7 @@
 
 > 本项目是基于 [pi-cache-optimizer](https://github.com/jiangge/pi-cache-optimizer) 的二次开发（fork），适配 OMP（Oh My Pi）运行时。原项目由 [freescheme](https://github.com/jiangge) 开发，在此致谢。
 >
-> 2.0.0 已同步到上游 pi-cache-optimizer **2.10.4**（保留上游 git 历史，模块化结构与上游一致），并适配 OMP **18**。
+> 2.1.0 已同步到上游 pi-cache-optimizer **2.10.4**（保留上游 git 历史，模块化结构与上游一致），并适配 OMP **18**。
 
 用于提升 OMP 中 provider 侧 KV Cache / Prompt Cache 命中率的扩展：为 OpenAI 兼容 API 提供稳定的 `prompt_cache_key`，处理长缓存保留与常见的代理拒绝，可选地清理 session-overview 中的易变字段以稳定 prompt 前缀，并在底部显示持久化的缓存统计。
 

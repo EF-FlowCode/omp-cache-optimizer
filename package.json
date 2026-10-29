@@ -1,6 +1,6 @@
 {
   "name": "omp-cache-optimizer",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Improve OMP prompt/KV cache hit rates with safer prompt churn cleanup, OpenAI-compatible cache keys, proxy compat warnings, and footer cache stats.",
   "keywords": [
     "omp-package",

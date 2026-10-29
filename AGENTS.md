@@ -48,7 +48,7 @@ git fetch pi
 git merge pi/master
 ```
 
-Resolve by keeping the OMP rules above; drop upstream's `.trellis/`, `.pi/`, `.mainline/`, `benchmarks/`, `publish.yml`. Modules that follow upstream almost verbatim (`stats-*`, `atomic-fs`, `tool-ordering`, `usage`, most of `provider-errors`) usually merge cleanly; `index.ts`, `command.ts`, `diagnostics.ts`, `compat-advice.ts`, `config.ts`, `routing.ts` carry the OMP adaptation.
+Resolve by keeping the OMP rules above; drop upstream's `.trellis/`, `.pi/`, `.mainline/`, `benchmarks/`; keep this fork's own `.github/workflows/publish.yml`. Modules that follow upstream almost verbatim (`stats-*`, `atomic-fs`, `tool-ordering`, `usage`, most of `provider-errors`) usually merge cleanly; `index.ts`, `command.ts`, `diagnostics.ts`, `compat-advice.ts`, `config.ts`, `routing.ts` carry the OMP adaptation.
 
 ## Development Commands
 
@@ -60,6 +60,10 @@ Resolve by keeping the OMP rules above; drop upstream's `.trellis/`, `.pi/`, `.m
 | `npm run check` | typecheck + tests + `git diff --check` + module graph + pack check |
 
 No build step: OMP loads `index.ts` and `src/` as TypeScript.
+
+## Releasing
+
+Releases go through CI, never a local `npm publish`. Bump `version` in `package.json` / `package-lock.json` on `main`, push, then push an annotated tag `vX.Y.Z` whose message is the Chinese release notes. `.github/workflows/publish.yml` verifies the tag matches `package.json`, runs `npm run check`, publishes with npm Trusted Publishing (OIDC + provenance, no stored token), and creates the GitHub Release from the tag message.
 
 ## Testing
 
