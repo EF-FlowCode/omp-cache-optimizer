@@ -63,12 +63,13 @@ No build step: OMP loads `index.ts` and `src/` as TypeScript.
 
 ## Releasing
 
-Releases go through CI, never a local `npm publish`. Bump `version` in `package.json` / `package-lock.json` on `main`, push, then push an annotated tag `vX.Y.Z` whose message is the Chinese release notes. `.github/workflows/publish.yml` verifies the tag matches `package.json`, runs `npm run check`, publishes with npm Trusted Publishing (OIDC + provenance, no stored token), and creates the GitHub Release from the tag message.
+Releases go through CI, never a local `npm publish`. Bump `version` in `package.json` / `package-lock.json` on `main`, push, then push an annotated tag `vX.Y.Z` whose message is the Chinese release notes. `.github/workflows/publish.yml` runs `ci.yml` (`npm run check` on Linux, macOS and Windows) as the gate, verifies the tag matches `package.json`, publishes one platform-independent tarball with npm Trusted Publishing (OIDC + provenance, no stored token), and creates the GitHub Release from the tag message.
 
 ## Testing
 
 - Node's built-in test runner with jiti; tests import `#extension` (`index.ts`) and drive the default export with a fake `ExtensionAPI` that captures handlers.
 - Tests isolate state with a temporary `PI_CODING_AGENT_DIR`.
+- CI runs on Linux, macOS and Windows; keep tests portable (`pathToFileURL` for dynamic imports of absolute paths, `basename` instead of splitting on `/`, skip tests that need POSIX file modes on `win32`).
 - OMP-specific behavior (session switch on one instance, subagent ownership, prompt_cache_key strategy, retention truth table, block-local rewrite) is covered in `tests/omp-*.test.ts`.
 
 ## Forbidden

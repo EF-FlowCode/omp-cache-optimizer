@@ -5,6 +5,8 @@ on:
     branches:
       - main
   pull_request:
+  # publish.yml runs these same checks as its release gate.
+  workflow_call:
 
 permissions:
   contents: read
@@ -15,9 +17,15 @@ concurrency:
 
 jobs:
   checks:
-    name: Typecheck, test, diff, and package checks
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    name: Checks (${{ matrix.os }})
+    # The package is plain TypeScript with no native code: one tarball serves
+    # every platform, so the matrix verifies it rather than building per OS.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
 
     steps:
       - name: Check out repository

@@ -4,6 +4,7 @@ import { lstat, mkdir, mkdtemp, readFile, readdir, rename, rm, unlink, utimes, w
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
+import { pathToFileURL } from "node:url";
 import { createJiti } from "jiti";
 
 // Regressions for the low findings R5-R9 of the 2.9.2 review of the issue
@@ -257,7 +258,7 @@ describe("R7: an awaited retry holds the process open", () => {
   test("print mode: a transient archive read retry in agent_end does not end the process before session_shutdown", async () => {
     await withAgentDir(async (dir) => {
       const script = `
-        const loaded = await import(${JSON.stringify(join(process.cwd(), "index.ts"))});
+        const loaded = await import(${JSON.stringify(pathToFileURL(join(process.cwd(), "index.ts")).href)});
         const extension = typeof loaded.default === "function" ? loaded.default : loaded.default.default;
         const I = loaded.__internals_for_tests ?? loaded.default.__internals_for_tests;
         const { writeFileSync, readdirSync, readFileSync } = await import("node:fs");
@@ -323,7 +324,7 @@ describe("R7: the shutdown flush is not abandoned", () => {
   test("OMP's print mode (exit by draining the event loop) still completes a final flush whose rename is being retried", async () => {
     await withAgentDir(async (dir) => {
       const script = `
-        const loaded = await import(${JSON.stringify(join(process.cwd(), "index.ts"))});
+        const loaded = await import(${JSON.stringify(pathToFileURL(join(process.cwd(), "index.ts")).href)});
         const extension = typeof loaded.default === "function" ? loaded.default : loaded.default.default;
         const I = loaded.__internals_for_tests ?? loaded.default.__internals_for_tests;
         const { writeFileSync, readdirSync, readFileSync } = await import("node:fs");

@@ -11,7 +11,13 @@ permissions:
   contents: read
 
 jobs:
+  # The full check suite on Linux, macOS and Windows; nothing is published
+  # unless all three pass.
+  checks:
+    uses: ./.github/workflows/ci.yml
+
   publish:
+    needs: checks
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -21,8 +27,6 @@ jobs:
     steps:
       - name: Check out release tag
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -41,12 +45,6 @@ jobs:
           tag_version="${GITHUB_REF_NAME#v}"
           package_version="$(node -p "require('./package.json').version")"
           test "$tag_version" = "$package_version"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run project checks
-        run: npm run check
 
       # Configure this repository and workflow as a Trusted Publisher for the
       # npm package before pushing a release tag.

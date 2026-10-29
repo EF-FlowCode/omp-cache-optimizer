@@ -5,7 +5,12 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join, normalize } from "node:path";
 
-const out = execFileSync("npm", ["pack", "--dry-run", "--json", "--cache", "node_modules/.cache/npm"], { encoding: "utf8" });
+// On Windows `npm` is npm.cmd, which execFileSync cannot start without a shell; under `npm run`,
+// npm_execpath points at npm's own CLI script, so run that with the current node instead.
+const packArgs = ["pack", "--dry-run", "--json", "--cache", "node_modules/.cache/npm"];
+const out = process.env.npm_execpath
+  ? execFileSync(process.execPath, [process.env.npm_execpath, ...packArgs], { encoding: "utf8" })
+  : execFileSync("npm", packArgs, { encoding: "utf8", shell: process.platform === "win32" });
 const packed = new Set(JSON.parse(out)[0].files.map((file) => normalize(file.path)));
 
 const sources = ["index.ts", ...readdirSync("src", { recursive: true }).filter((f) => String(f).endsWith(".ts")).map((f) => join("src", String(f)))];

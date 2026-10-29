@@ -11,6 +11,8 @@ const DAY = 24 * 3600_000;
 const HOUR = 3600_000;
 const KEY = "proxy/gpt-5.5";
 const isRoot = typeof process.getuid === "function" && process.getuid() === 0;
+// Windows chmod only toggles the read-only bit, so a mode cannot make a file unreadable.
+const noFileModes = (isRoot && "root ignores file modes") || (process.platform === "win32" && "Windows has no POSIX file modes");
 
 function localDay(ms: number): string {
   const date = new Date(ms);
@@ -61,7 +63,7 @@ async function sessionRequests(I: any): Promise<number | undefined> {
 }
 
 describe("issue #28 archive: adversarial review regressions", () => {
-  test("an absorbed leftover that is unreadable during the next pass stays absorbed (no permanent double count)", { skip: isRoot && "root ignores file modes" }, async () => {
+  test("an absorbed leftover that is unreadable during the next pass stays absorbed (no permanent double count)", { skip: noFileModes }, async () => {
     await withAgentDir(async () => {
       const first = await load("leftover-a");
       const now = Date.now();
@@ -141,7 +143,7 @@ describe("issue #28 archive: adversarial review regressions", () => {
     });
   });
 
-  test("an unreadable owner file fails closed for publishing but still lets the holder release", { skip: isRoot && "root ignores file modes" }, async () => {
+  test("an unreadable owner file fails closed for publishing but still lets the holder release", { skip: noFileModes }, async () => {
     await withAgentDir(async () => {
       const I = await load("owner-unreadable");
       const lockPath = join(I.SHARD_FILES_DIR, "..", "maintenance", "cleanup.lock");

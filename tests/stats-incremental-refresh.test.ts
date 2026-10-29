@@ -3,8 +3,9 @@ import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { mkdir, mkdtemp, readFile, rm, unlink, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { describe, test } from "node:test";
+import { pathToFileURL } from "node:url";
 import { createJiti } from "jiti";
 
 // 2.10 incremental footer refresh: the single-flight scheduler, the tiered
@@ -266,7 +267,7 @@ describe("tiered shard index", () => {
         const steady = await index.refresh({ own: `${own}.json` });
         assert.deepEqual({ readdir: counting.counts.readdir, lstat: counting.counts.lstat, readFile: counting.counts.readFile, stat: counting.counts.stat },
           { readdir: 1, lstat: 2, readFile: 0, stat: 0 }, "steady state: one listing plus the hot set (active + updated within 15 min)");
-        assert.deepEqual(counting.counts.paths.filter((path: string) => path.startsWith("lstat")).map((path: string) => path.split("/").at(-1)).sort(),
+        assert.deepEqual(counting.counts.paths.filter((path: string) => path.startsWith("lstat")).map((path: string) => basename(path)).sort(),
           [`${recentClosed}.json`, `${active}.json`].sort());
         assert.equal(JSON.stringify(steady), JSON.stringify(reference));
 
@@ -671,7 +672,7 @@ describe("non-awaited lifecycle refreshes", () => {
   test("print mode: message_end's awaited epoch read retry (EPERM) keeps the process alive until it and the shutdown finish", async () => {
     await withAgentDir(async (dir) => {
       const script = `
-        const loaded = await import(${JSON.stringify(join(process.cwd(), "index.ts"))});
+        const loaded = await import(${JSON.stringify(pathToFileURL(join(process.cwd(), "index.ts")).href)});
         const extension = typeof loaded.default === "function" ? loaded.default : loaded.default.default;
         const I = loaded.__internals_for_tests ?? loaded.default.__internals_for_tests;
         const { writeFileSync, readdirSync, readFileSync } = await import("node:fs");
