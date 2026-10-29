@@ -11,10 +11,13 @@ permissions:
   contents: read
 
 jobs:
-  # The full check suite on Linux, macOS and Windows; nothing is published
-  # unless all three pass.
+  # The full check suite on Linux and Windows; nothing is published unless
+  # both pass. macOS runs on every push and PR instead: hosted macOS runners
+  # are often unavailable, and GitHub cancels a job it cannot place.
   checks:
     uses: ./.github/workflows/ci.yml
+    with:
+      os: '["ubuntu-latest", "windows-latest"]'
 
   publish:
     needs: checks

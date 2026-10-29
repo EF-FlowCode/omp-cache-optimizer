@@ -63,7 +63,7 @@ No build step: OMP loads `index.ts` and `src/` as TypeScript.
 
 ## Releasing
 
-Releases go through CI, never a local `npm publish`. Bump `version` in `package.json` / `package-lock.json` on `main`, push, then push an annotated tag `vX.Y.Z` whose message is the Chinese release notes. `.github/workflows/publish.yml` runs `ci.yml` (`npm run check` on Linux, macOS and Windows) as the gate, verifies the tag matches `package.json`, publishes one platform-independent tarball with npm Trusted Publishing (OIDC + provenance, no stored token), and creates the GitHub Release from the tag message.
+Releases go through CI, never a local `npm publish`. Bump `version` in `package.json` / `package-lock.json` on `main`, push, then push an annotated tag `vX.Y.Z` whose message is the Chinese release notes. `.github/workflows/publish.yml` runs `ci.yml` (`npm run check` on Linux and Windows; macOS runs on push/PR only, since hosted macOS runners are often unavailable) as the gate, verifies the tag matches `package.json`, publishes one platform-independent tarball with npm Trusted Publishing (OIDC + provenance, no stored token), and creates the GitHub Release from the tag message.
 
 ## Testing
 
