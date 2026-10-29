@@ -63,7 +63,12 @@ No build step: OMP loads `index.ts` and `src/` as TypeScript.
 
 ## Releasing
 
-Releases go through CI, never a local `npm publish`. Bump `version` in `package.json` / `package-lock.json` on `main`, push, then push an annotated tag `vX.Y.Z` (`git tag -a vX.Y.Z --cleanup=verbatim -F notes.md`; the default cleanup strips `#` heading lines) whose message is the Chinese release notes. `.github/workflows/publish.yml` runs `ci.yml` (`npm run check` on Linux and Windows; macOS runs on push/PR only, since hosted macOS runners are often unavailable) as the gate, verifies the tag matches `package.json`, publishes one platform-independent tarball with npm Trusted Publishing (OIDC + provenance, no stored token), and creates the GitHub Release from the tag message.
+Releases go through CI, never a local `npm publish`. `CHANGELOG.md` (Chinese, Keep a Changelog) is the single source of release notes: record user-facing changes under `## [Unreleased]` as they land.
+
+1. On `main`: rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` and add a fresh empty `## [Unreleased]` above it; add the link reference at the bottom; bump `version` in `package.json` / `package-lock.json`; commit and push.
+2. `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+`.github/workflows/publish.yml` runs `ci.yml` (`npm run check` on Linux and Windows; macOS runs on push/PR only, since hosted macOS runners are often unavailable) as the gate, verifies the tag matches `package.json`, extracts the version's section with `scripts/release-notes.mjs` (a missing or empty section fails the release before publishing), publishes one platform-independent tarball with npm Trusted Publishing (OIDC + provenance, no stored token), and creates the GitHub Release with those notes. Preview the notes locally with `node scripts/release-notes.mjs X.Y.Z`.
 
 ## Testing
 

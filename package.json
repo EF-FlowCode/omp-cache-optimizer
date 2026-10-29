@@ -19,7 +19,8 @@
   "license": "MIT",
   "files": [
     "index.ts",
-    "src"
+    "src",
+    "CHANGELOG.md"
   ],
   "omp": {
     "extensions": [

@@ -31,15 +31,6 @@ jobs:
       - name: Check out release tag
         uses: actions/checkout@v7
 
-      # actions/checkout fetches the tag as a lightweight ref, dropping its
-      # annotation; refetch the tag object so the release notes are its message.
-      # Runs before publishing so a lightweight tag fails the release early.
-      - name: Fetch annotated release tag
-        shell: bash
-        run: |
-          git fetch --force --no-tags origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
-          test "$(git cat-file -t "refs/tags/${GITHUB_REF_NAME}")" = tag
-
       # No dependency cache in the release job (cache-poisoning hardening):
       # it installs nothing; the checks ran in the gate above.
       - name: Set up Node.js
@@ -60,13 +51,17 @@ jobs:
           package_version="$(node -p "require('./package.json').version")"
           test "$tag_version" = "$package_version"
 
+      # Release notes are this version's CHANGELOG.md section; a missing or
+      # empty section fails here, before anything is published.
+      - name: Extract release notes from CHANGELOG.md
+        run: node scripts/release-notes.mjs "${GITHUB_REF_NAME#v}" > "$RUNNER_TEMP/release-notes.md"
+
       # Configure this repository and workflow as a Trusted Publisher for the
       # npm package before pushing a release tag.
       - name: Publish to npm with OIDC
         run: npm publish --provenance
 
-      # Release notes come from the annotated tag message.
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" --verify-tag --notes-from-tag --title "$GITHUB_REF_NAME"
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --notes-file "$RUNNER_TEMP/release-notes.md" --title "$GITHUB_REF_NAME"
