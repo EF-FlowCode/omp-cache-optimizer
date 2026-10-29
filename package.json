@@ -1,7 +1,7 @@
 {
   "name": "omp-cache-optimizer",
-  "version": "1.2.3",
-  "description": "Improve OMP prompt/KV cache hit rates with safer prompt churn cleanup, proxy compat warnings, and footer cache stats.",
+  "version": "2.0.0",
+  "description": "Improve OMP prompt/KV cache hit rates with safer prompt churn cleanup, OpenAI-compatible cache keys, proxy compat warnings, and footer cache stats.",
   "keywords": [
     "omp-package",
     "omp",
@@ -18,7 +18,8 @@
   "author": "n1netynine99",
   "license": "MIT",
   "files": [
-    "index.ts"
+    "index.ts",
+    "src"
   ],
   "omp": {
     "extensions": [
@@ -31,10 +32,33 @@
       "./index.ts"
     ]
   },
+  "imports": {
+    "#extension": "./index.ts"
+  },
+  "scripts": {
+    "test": "node --import jiti/register --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit --pretty false",
+    "check:diff": "git diff --check",
+    "check:pack": "node scripts/check-pack.mjs",
+    "check": "npm run typecheck && npm test && npm run check:diff && npm run check:modules && npm run check:pack",
+    "check:modules": "node scripts/check-module-graph.mjs"
+  },
+  "devDependencies": {
+    "@oh-my-pi/pi-coding-agent": "18.13.3",
+    "@types/node": "^22.0.0",
+    "jiti": "^2.7.0",
+    "typescript": "^5.8.3"
+  },
   "peerDependencies": {
-    "@oh-my-pi/pi-coding-agent": ">=17.0.0 <18.0.0"
+    "@oh-my-pi/pi-coding-agent": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@oh-my-pi/pi-coding-agent": {
+      "optional": true
+    }
   },
   "repository": {
+    "type": "git",
     "url": "git+https://github.com/EF-FlowCode/omp-cache-optimizer.git"
   },
   "homepage": "https://github.com/EF-FlowCode/omp-cache-optimizer",

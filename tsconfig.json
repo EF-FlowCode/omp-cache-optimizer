@@ -4,13 +4,15 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noEmit": true,
-    "strict": false,
+    "strict": true,
+    "noUnusedLocals": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowImportingTsExtensions": true
   },
   "include": [
     "index.ts",
-    "types/**/*.d.ts"
+    "src/**/*.ts",
+    "tests/**/*.ts"
   ]
 }
